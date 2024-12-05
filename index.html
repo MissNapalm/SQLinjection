@@ -8,14 +8,24 @@
 </head>
 <body class="bg-gray-100">
     <header class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto px-4">
-            <h1 class="text-3xl font-bold">Your News Website</h1>
-            <p class="text-sm">Your daily dose of news</p>
-            <input type="text" id="search-input" placeholder="Search articles" class="border border-gray-300 p-2 rounded-lg text-black">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold" id="site-title">Your News Website</h1>
+                <p class="text-sm">Your daily dose of news</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="text" id="search-input" placeholder="Search articles" class="border border-gray-300 p-1 rounded-lg text-black">
+                <input type="text" id="username" placeholder="Username" class="border border-gray-300 p-1 rounded-lg text-black">
+                <input type="password" id="password" placeholder="Password" class="border border-gray-300 p-1 rounded-lg text-black">
+                <button id="login-button" class="bg-blue-500 text-white px-3 py-1 rounded-lg">Login</button>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
+        <div id="admin-controls" class="hidden mb-4">
+            <button id="add-post-button" class="bg-green-500 text-white px-3 py-1 rounded-lg">Add New Post</button>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="news-articles">
         </div>
     </main>
@@ -27,74 +37,139 @@
     </footer>
 
     <script>
+        // Simulated "database"
         const newsArticles = [
-            {
-                title: "AI Breakthrough: Machines Now Dream in Color",
-                description: "Scientists have developed a new AI model that can generate realistic and vivid dreams.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            },
-            {
-                title: "Climate Change: The World Faces a Critical Turning Point",
-                description: "Experts warn of the devastating consequences of inaction on climate change.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            },
-            {
-                title: "Space Exploration: Humans Set Foot on Mars",
-                description: "A historic moment as humanity takes its first steps on the Red Planet.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            },
-            {
-                title: "Tech Giant Announces Revolutionary New Product",
-                description: "A groundbreaking innovation that will change the way we live and work.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            },
-            {
-                title: "Global Health Crisis: A New Pandemic Threatens Humanity",
-                description: "Scientists race to develop a vaccine against a deadly new virus.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            },
-            {
-                title: "Economic Collapse Looms as Inflation Soars",
-                description: "Experts warn of a potential economic downturn as prices continue to rise.",
-                imageUrl: "https://via.placeholder.com/600x300"
-            }
+            { id: 1, title: "AI Breakthrough: Machines Now Dream in Color", description: "Scientists have developed a new AI model that can generate realistic and vivid dreams.", imageUrl: "https://via.placeholder.com/600x300" },
+            { id: 2, title: "Climate Change: The World Faces a Critical Turning Point", description: "Experts warn of the devastating consequences of inaction on climate change.", imageUrl: "https://via.placeholder.com/600x300" },
+            { id: 3, title: "Space Exploration: Humans Set Foot on Mars", description: "A historic moment as humanity takes its first steps on the Red Planet.", imageUrl: "https://via.placeholder.com/600x300" }
         ];
+
+        let isAdmin = false;
 
         const articlesContainer = document.getElementById('news-articles');
         const searchInput = document.getElementById('search-input');
+        const loginButton = document.getElementById('login-button');
+        const adminControls = document.getElementById('admin-controls');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const addPostButton = document.getElementById('add-post-button');
 
-        function filterArticles(query) {
-            const filteredArticles = newsArticles.filter(article => {
-                return article.title.toLowerCase().includes(query.toLowerCase());
-            });
+        // Admin credentials (from the simulated password leak)
+        const adminUsername = 'admin';
+        const adminPassword = 'secret123';
 
+        // Render articles
+        function renderArticles(filteredArticles = newsArticles) {
             articlesContainer.innerHTML = '';
-
             filteredArticles.forEach(article => {
                 const articleElement = document.createElement('div');
                 articleElement.classList.add('bg-white', 'rounded-lg', 'shadow-md');
+
+                let adminButtons = '';
+                if (isAdmin) {
+                    adminButtons = `
+                        <button class="bg-yellow-500 text-white px-2 py-1 rounded-lg edit-post" data-id="${article.id}">Edit</button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded-lg delete-post" data-id="${article.id}">Delete</button>
+                    `;
+                }
 
                 const articleHtml = `
                     <img src="${article.imageUrl}" alt="${article.title}" class="rounded-t-lg">
                     <div class="p-4">
                         <h2 class="text-xl font-bold">${article.title}</h2>
                         <p>${article.description}</p>
-                        <a href="#" class="text-blue-500 hover:underline">Read More</a>
+                        <div class="mt-2">${adminButtons}</div>
                     </div>
                 `;
 
                 articleElement.innerHTML = articleHtml;
                 articlesContainer.appendChild(articleElement);
             });
+
+            // Add event listeners for admin actions
+            if (isAdmin) {
+                document.querySelectorAll('.delete-post').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = parseInt(button.getAttribute('data-id'), 10);
+                        deletePost(id);
+                    });
+                });
+
+                document.querySelectorAll('.edit-post').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = parseInt(button.getAttribute('data-id'), 10);
+                        editPost(id);
+                    });
+                });
+            }
         }
 
-        // Initial display of all articles
-        filterArticles('');
+        // Handle login
+        loginButton.addEventListener('click', () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
 
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value;
-            filterArticles(query);
+            if (username === adminUsername && password === adminPassword) {
+                isAdmin = true;
+                alert('Logged in as admin!');
+                adminControls.classList.remove('hidden');
+                renderArticles();
+            } else {
+                alert('Invalid credentials.');
+            }
         });
+
+        // Search functionality
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const filteredArticles = newsArticles.filter(article => 
+                article.title.toLowerCase().includes(query) || 
+                article.description.toLowerCase().includes(query)
+            );
+            renderArticles(filteredArticles);
+        });
+
+        // Add a new post
+        addPostButton.addEventListener('click', () => {
+            const title = prompt('Enter the post title:');
+            const description = prompt('Enter the post description:');
+            const imageUrl = prompt('Enter the image URL:');
+            if (title && description && imageUrl) {
+                newsArticles.push({
+                    id: newsArticles.length + 1,
+                    title,
+                    description,
+                    imageUrl
+                });
+                renderArticles();
+            } else {
+                alert('All fields are required to add a post.');
+            }
+        });
+
+        // Delete a post
+        function deletePost(id) {
+            const index = newsArticles.findIndex(article => article.id === id);
+            if (index !== -1) {
+                newsArticles.splice(index, 1);
+                renderArticles();
+            }
+        }
+
+        // Edit a post
+        function editPost(id) {
+            const article = newsArticles.find(article => article.id === id);
+            if (article) {
+                const newTitle = prompt('Edit the post title:', article.title);
+                const newDescription = prompt('Edit the post description:', article.description);
+                if (newTitle !== null) article.title = newTitle;
+                if (newDescription !== null) article.description = newDescription;
+                renderArticles();
+            }
+        }
+
+        // Initial rendering
+        renderArticles();
     </script>
 </body>
 </html>
