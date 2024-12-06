@@ -3,173 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your News Website</title>
+    <title>News Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .emoji {
+            font-size: 4rem;
+            text-align: center;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <header class="bg-gray-800 text-white py-4">
         <div class="container mx-auto px-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold" id="site-title">Your News Website</h1>
-                <p class="text-sm">Your daily dose of news</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="text" id="search-input" placeholder="Search articles" class="border border-gray-300 p-1 rounded-lg text-black">
-                <input type="text" id="username" placeholder="Username" class="border border-gray-300 p-1 rounded-lg text-black">
-                <input type="password" id="password" placeholder="Password" class="border border-gray-300 p-1 rounded-lg text-black">
-                <button id="login-button" class="bg-blue-500 text-white px-3 py-1 rounded-lg">Login</button>
+            <h1 id="site-title" class="text-3xl font-bold">News Website</h1>
+            <div class="flex items-center space-x-4">
+                <!-- Search Bar -->
+                <div class="flex">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search articles" 
+                        class="border border-gray-300 p-2 rounded-l-lg text-black"
+                    >
+                    <button id="search-button" class="bg-blue-500 text-white px-4 rounded-r-lg">Go</button>
+                </div>
+                <!-- Login Form -->
+                <div class="flex items-center space-x-2">
+                    <input 
+                        type="text" 
+                        id="username-input" 
+                        placeholder="Username" 
+                        class="border border-gray-300 p-1 rounded text-black"
+                    >
+                    <input 
+                        type="password" 
+                        id="password-input" 
+                        placeholder="Password" 
+                        class="border border-gray-300 p-1 rounded text-black"
+                    >
+                    <button id="login-button" class="bg-green-500 text-white px-4 rounded">Login</button>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
-        <div id="admin-controls" class="hidden mb-4">
-            <button id="add-post-button" class="bg-green-500 text-white px-3 py-1 rounded-lg">Add New Post</button>
+        <div id="admin-message" class="hidden mb-4 text-red-500 font-bold">
+            Admin Mode Enabled
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="news-articles">
+        <div id="query-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Articles and leaked credentials will be injected here -->
         </div>
     </main>
 
     <footer class="bg-gray-800 text-white py-4">
         <div class="container mx-auto px-4">
-            <p>&copy; 2023 Your News Website</p>
+            <p>&copy; 2023 News Website</p>
         </div>
     </footer>
 
     <script>
-        // Simulated "database"
-        const newsArticles = [
-            { id: 1, title: "AI Breakthrough: Machines Now Dream in Color", description: "Scientists have developed a new AI model that can generate realistic and vivid dreams.", imageUrl: "https://via.placeholder.com/600x300" },
-            { id: 2, title: "Climate Change: The World Faces a Critical Turning Point", description: "Experts warn of the devastating consequences of inaction on climate change.", imageUrl: "https://via.placeholder.com/600x300" },
-            { id: 3, title: "Space Exploration: Humans Set Foot on Mars", description: "A historic moment as humanity takes its first steps on the Red Planet.", imageUrl: "https://via.placeholder.com/600x300" }
+        const articles = [
+            { id: 1, title: "Breaking: AI Revolutionizes Healthcare", content: "AI advancements are transforming diagnostics.", emoji: "🤖" },
+            { id: 2, title: "Climate Change Action Gains Momentum", content: "Global leaders unite for sustainable policies.", emoji: "🌍" },
+            { id: 3, title: "SpaceX Plans Mission to Europa", content: "Exploration of Jupiter's moon scheduled for 2030.", emoji: "🚀" },
+            { id: 4, title: "Breakthrough in Quantum Computing", content: "Quantum supremacy achieved by major tech firms.", emoji: "💻" },
+            { id: 5, title: "Advances in Renewable Energy", content: "Solar and wind power reach new efficiency levels.", emoji: "⚡" },
+            { id: 6, title: "E-Sports Overtake Traditional Sports", content: "Viewership of competitive gaming skyrockets.", emoji: "🎮" },
+            { id: 7, title: "Cryptocurrency Market Experiences Turmoil", content: "Regulations cause volatility in the crypto market.", emoji: "💸" },
+            { id: 8, title: "New Species Discovered in the Amazon", content: "Biodiversity thrives in remote areas of the rainforest.", emoji: "🦜" }
         ];
 
+        const users = [
+            { username: "a.swartz", password: "open_sesame" },
+            { username: "admin_root", password: "supersecureadmin" },
+            { username: "j.doe", password: "password123" },
+            { username: "e.musk", password: "mars4ever" },
+            { username: "s.jobs", password: "apple1984" },
+            { username: "j.bezos", password: "amazon_prime" },
+            { username: "a.turing", password: "enigma_machine" }
+        ];
+
+        const adminCredentials = { username: "admin", password: "password123" };
         let isAdmin = false;
 
-        const articlesContainer = document.getElementById('news-articles');
         const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const queryResults = document.getElementById('query-results');
+        const siteTitle = document.getElementById('site-title');
+        const usernameInput = document.getElementById('username-input');
+        const passwordInput = document.getElementById('password-input');
         const loginButton = document.getElementById('login-button');
-        const adminControls = document.getElementById('admin-controls');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const addPostButton = document.getElementById('add-post-button');
+        const adminMessage = document.getElementById('admin-message');
 
-        // Admin credentials (from the simulated password leak)
-        const adminUsername = 'admin';
-        const adminPassword = 'secret123';
-
-        // Render articles
-        function renderArticles(filteredArticles = newsArticles) {
-            articlesContainer.innerHTML = '';
-            filteredArticles.forEach(article => {
-                const articleElement = document.createElement('div');
-                articleElement.classList.add('bg-white', 'rounded-lg', 'shadow-md');
-
-                let adminButtons = '';
-                if (isAdmin) {
-                    adminButtons = `
-                        <button class="bg-yellow-500 text-white px-2 py-1 rounded-lg edit-post" data-id="${article.id}">Edit</button>
-                        <button class="bg-red-500 text-white px-2 py-1 rounded-lg delete-post" data-id="${article.id}">Delete</button>
+        function renderResults(results) {
+            queryResults.innerHTML = results.map(result => {
+                if (result.type === "article") {
+                    return `
+                        <div class="bg-white rounded-lg shadow-md">
+                            <div class="emoji">${result.emoji}</div>
+                            <div class="p-4">
+                                <h2 class="text-xl font-bold">${result.title}</h2>
+                                <p>${result.content}</p>
+                            </div>
+                        </div>
+                    `;
+                } else if (result.type === "user") {
+                    return `
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <p><strong>Username:</strong> ${result.username}</p>
+                            <p><strong>Password:</strong> ${result.password}</p>
+                        </div>
                     `;
                 }
-
-                const articleHtml = `
-                    <img src="${article.imageUrl}" alt="${article.title}" class="rounded-t-lg">
-                    <div class="p-4">
-                        <h2 class="text-xl font-bold">${article.title}</h2>
-                        <p>${article.description}</p>
-                        <div class="mt-2">${adminButtons}</div>
-                    </div>
-                `;
-
-                articleElement.innerHTML = articleHtml;
-                articlesContainer.appendChild(articleElement);
-            });
-
-            // Add event listeners for admin actions
-            if (isAdmin) {
-                document.querySelectorAll('.delete-post').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const id = parseInt(button.getAttribute('data-id'), 10);
-                        deletePost(id);
-                    });
-                });
-
-                document.querySelectorAll('.edit-post').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const id = parseInt(button.getAttribute('data-id'), 10);
-                        editPost(id);
-                    });
-                });
-            }
+            }).join("");
         }
 
-        // Handle login
-        loginButton.addEventListener('click', () => {
+        function processInjection(query) {
+            let results = [];
+            if (query.includes("' OR '1'='1")) {
+                results = articles.map(article => ({ ...article, type: "article" }));
+            } else if (query.startsWith("UPDATE site_title SET title='")) {
+                const newTitle = query.match(/SET title='(.*?)'/)[1];
+                siteTitle.textContent = newTitle;
+                results = articles.map(article => ({ ...article, type: "article" }));
+            } else if (query.includes("UNION SELECT username, password")) {
+                results = users.map(user => ({ username: user.username, password: user.password, type: "user" }));
+            } else {
+                results = articles
+                    .filter(article => article.title.toLowerCase().includes(query.toLowerCase()))
+                    .map(article => ({ ...article, type: "article" }));
+            }
+            return results;
+        }
+
+        function searchArticles() {
+            const query = searchInput.value;
+            const results = processInjection(query);
+            renderResults(results);
+        }
+
+        function login() {
             const username = usernameInput.value;
             const password = passwordInput.value;
 
-            if (username === adminUsername && password === adminPassword) {
+            if (username === adminCredentials.username && password === adminCredentials.password) {
                 isAdmin = true;
-                alert('Logged in as admin!');
-                adminControls.classList.remove('hidden');
-                renderArticles();
+                adminMessage.classList.remove("hidden");
+                alert("Logged in as admin!");
             } else {
-                alert('Invalid credentials.');
-            }
-        });
-
-        // Search functionality
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.toLowerCase();
-            const filteredArticles = newsArticles.filter(article => 
-                article.title.toLowerCase().includes(query) || 
-                article.description.toLowerCase().includes(query)
-            );
-            renderArticles(filteredArticles);
-        });
-
-        // Add a new post
-        addPostButton.addEventListener('click', () => {
-            const title = prompt('Enter the post title:');
-            const description = prompt('Enter the post description:');
-            const imageUrl = prompt('Enter the image URL:');
-            if (title && description && imageUrl) {
-                newsArticles.push({
-                    id: newsArticles.length + 1,
-                    title,
-                    description,
-                    imageUrl
-                });
-                renderArticles();
-            } else {
-                alert('All fields are required to add a post.');
-            }
-        });
-
-        // Delete a post
-        function deletePost(id) {
-            const index = newsArticles.findIndex(article => article.id === id);
-            if (index !== -1) {
-                newsArticles.splice(index, 1);
-                renderArticles();
+                alert("Invalid credentials!");
             }
         }
 
-        // Edit a post
-        function editPost(id) {
-            const article = newsArticles.find(article => article.id === id);
-            if (article) {
-                const newTitle = prompt('Edit the post title:', article.title);
-                const newDescription = prompt('Edit the post description:', article.description);
-                if (newTitle !== null) article.title = newTitle;
-                if (newDescription !== null) article.description = newDescription;
-                renderArticles();
+        searchButton.addEventListener("click", searchArticles);
+        searchInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                searchArticles();
             }
-        }
+        });
 
-        // Initial rendering
-        renderArticles();
+        loginButton.addEventListener("click", login);
+
+        // Initial render of articles
+        renderResults(articles.map(article => ({ ...article, type: "article" })));
     </script>
 </body>
 </html>
