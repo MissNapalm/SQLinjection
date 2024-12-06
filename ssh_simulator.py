@@ -24,7 +24,7 @@ file_system = {
         "permissions": {"read": True, "execute": True}
     },
     "/home/a.turing": {
-        "contents": ["notes.txt", "exploitscan.py", "exploit.sh", "exfildata.py", "ransomware.py", "exfil"],
+        "contents": ["notes.txt", "exploitscan.py", "exploit.sh", "exfildata.py", "ransomware.py"],
         "permissions": {"read": True, "execute": True}
     },
     "/var": {
@@ -55,6 +55,9 @@ employee_data = [
     {"name": "Jane Doe", "role": "HR Manager", "email": "jane.doe@company.com"}
 ]
 
+current_directory = "/"
+is_admin = False
+
 def generate_client_file_content(index):
     """Generates realistic client information for a specific file."""
     fake_clients = [
@@ -66,9 +69,6 @@ def generate_client_file_content(index):
     ]
     client = fake_clients[index % len(fake_clients)]
     return f"{client['name']}: {client['card_number']} (Expiry: {client['expiry']}, CVV: {client['cvv']})"
-
-current_directory = "/"
-is_admin = False
 
 def clear_screen():
     """Clears the terminal screen."""
@@ -177,72 +177,283 @@ def simulate_data_exfiltration():
         return
 
     print("\n[*] Starting data exfiltration sequence...")
+    time.sleep(1.2)
     print("[*] Establishing connection to C2 server...")
+    time.sleep(2.3)
     print("[+] Connection established: 185.147.xxx.xxx:443")
-    print("[*] Scanning /var/data/client_data for sensitive information...")
+    
+    print("\n[*] Scanning /var/data/client_data for sensitive information...")
+    time.sleep(3.4)
     print("[+] Found 50 files containing payment data")
-    print("[*] Creating encrypted archive...")
+    
+    print("\n[*] Creating encrypted archive...")
+    time.sleep(0.7)
     print("    → Compression: xz")
     print("    → Encryption: AES-256")
     
-    for i in range(51):
-        sys.stdout.write(f"\r[*] Processing files: {i}/50 [{i*2*'='}{(100-i*2)*' '}] {i*2}%")
+    processed = 0
+    chunk_sizes = [3, 1, 4, 2, 5, 3, 2, 4, 1, 2]  # Irregular chunks
+    
+    for chunk in chunk_sizes:
+        time.sleep(random.uniform(1.2, 2.8))  # Variable processing time
+        processed = min(processed + chunk, 50)
+        sys.stdout.write(f"\r[*] Processing files: {processed}/50 [{processed*2*'='}{(100-processed*2)*' '}] {processed*2}%")
         sys.stdout.flush()
     
     print("\n\n[+] Archive created: client_data.tar.xz.enc")
-    print("[*] Initiating secure transfer...")
+    time.sleep(1.3)
     
+    print("\n[*] Initiating secure transfer...")
+    
+    # Transfer simulation with variable speeds
     total_size = 42.7
-    for i in range(101):
-        progress = i / 100 * total_size
-        speed = random.uniform(1.8, 2.3)
-        sys.stdout.write(f"\r[*] Transferring data: {i}% ({speed:.1f} MB/s) - {progress:.1f}/{total_size:.1f} MB")
+    speeds = [(0, 1.5, "2.1"), (1.5, 3.2, "1.8"), (3.2, 4.1, "2.3"), (4.1, 5.0, "1.9")]
+    
+    for start_time, duration, speed in speeds:
+        time.sleep(duration - start_time)
+        progress = (duration / 5.0) * 100
+        sys.stdout.write(f"\r[*] Transferring data: {progress:.1f}% ({speed} MB/s) - {duration:.1f}/{total_size:.1f} MB")
         sys.stdout.flush()
+        if random.random() < 0.1:  # Network stutter
+            time.sleep(random.uniform(0.3, 0.7))
     
     print("\n\n[+] Transfer complete")
-    print("[*] Removing traces...")
+    time.sleep(1.4)
+    
+    print("\n[*] Removing traces...")
     print("[*] Deleting local archive...")
+    time.sleep(1.2)
     print("[*] Clearing system logs...")
+    time.sleep(2.1)
     print("[*] Removing source files...")
     print("[+] Cleanup complete")
+    time.sleep(0.4)
     print("\n[+] Exfiltration successful - 50 files exfiltrated")
     print("[+] Connection terminated")
 
-# Main logic follows...
 def simulate_ransomware():
     """Simulates a ransomware attack sequence."""
     if not is_admin:
         print("Permission denied")
         return
 
-    print("\n[*] Initializing ransomware...")
-    print("[*] Encrypting files...")
-    time.sleep(2)
-    print("[*] Writing ransom note...")
+    # ANSI escape codes for colors
+    RED = "\033[91m"
+    RESET = "\033[0m"
+    
+    ransomware_text = f"""{RED}
+██████╗  █████╗ ███╗   ██╗███████╗ ██████╗ ███╗   ███╗██╗    ██╗ █████╗ ██████╗ ███████╗
+██╔══██╗██╔══██╗████╗  ██║██╔════╝██╔═══██╗████╗ ████║██║    ██║██╔══██╗██╔══██╗██╔════╝
+██████╔╝███████║██╔██╗ ██║███████╗██║   ██║██╔████╔██║██║ █╗ ██║███████║██████╔╝█████╗  
+██╔══██╗██╔══██║██║╚██╗██║╚════██║██║   ██║██║╚██╔╝██║██║███╗██║██╔══██║██╔══██╗██╔══╝  
+██║  ██║██║  ██║██║ ╚████║███████║╚██████╔╝██║ ╚═╝ ██║╚███╔███╔╝██║  ██║██║  ██║███████╗
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝     ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+{RESET}"""
+
+    clear_screen()
+    print("\n[*] Initializing encryption sequence...")
+    time.sleep(1.7)
+    print("[*] Loading encryption keys...")
+    time.sleep(2.1)
+    print("[+] RSA-4096 public key loaded")
+    
+    print("\n[*] Enumerating system drives...")
+    time.sleep(1.4)
+    print("""    → /dev/sda1 (mounted at /)
+    → /dev/sdb1 (mounted at /home)
+    → /dev/sdc1 (mounted at /var)""")
+    
+    print("\n[*] Scanning for target files...")
+    time.sleep(3.2)
+    print("""[+] Found target files:
+    → Documents: 1,842 files
+    → Databases: 13 files
+    → Configuration: 156 files
+    → Total size: 2.7 GB""")
+    
+    print("\n[*] Starting encryption process...")
+    
+    directories = [
+        ("/var/data", 312),
+        ("/etc/config", 89),
+        ("/home/users", 1238),
+        ("/var/www", 372)
+    ]
+    
+    for directory, files in directories:
+        print(f"\n[*] Encrypting {directory}")
+        encrypted = 0
+        while encrypted < files:
+            if random.random() < 0.05:  # Disk wait
+                time.sleep(random.uniform(0.5, 1.0))
+            chunk = min(random.randint(10, 30), files - encrypted)
+            encrypted += chunk
+            progress = (encrypted / files) * 100
+            sys.stdout.write(f"\r    Progress: [{int(progress/2)*'='}{(50-int(progress/2))*' '}] {progress:.1f}% ({encrypted}/{files} files)")
+            sys.stdout.flush()
+            time.sleep(random.uniform(0.1, 0.4))
+        print()
+    
+    print("\n[*] Generating ransom notes...")
+    time.sleep(1.8)
+    print("[*] Removing volume shadow copies...")
+    time.sleep(2.1)
+    print("[*] Clearing system logs...")
+    time.sleep(1.4)
+    print("[+] Encryption complete")
+    
     time.sleep(1)
-    print("[+] Ransomware complete. All files are encrypted.")
+    clear_screen()
+    print(ransomware_text)
+    print(f"""{RED}
+    YOUR FILES HAVE BEEN ENCRYPTED!
+    
+    Your important files have been encrypted with military-grade encryption.
+    To recover your files, you must pay 5 BTC to the following address:
+    bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+    
+    Contact us at: [email protected] with your unique ID:
+    0xC7F2A95B4E8D3A1C
+    
+    WARNING: Do not attempt to decrypt files or modify them, or they will be
+    permanently damaged.{RESET}""")
+
+def scan_system():
+    """Simulates a thorough system scan for privilege escalation vulnerabilities."""
+    def print_header(text):
+        print("\n" + "=" * 60)
+        print(text)
+        print("=" * 60)
+
+    print_header("Starting system scan for privilege escalation vectors...")
+    time.sleep(2.3)
+
+    print("[*] Checking kernel version...")
+    time.sleep(0.1)
+    print("    → Linux version 5.4.0-135-generic")
+    time.sleep(0.2)
+    print("    → Ubuntu 20.04.5 LTS (Focal Fossa)")
+    
+    time.sleep(3.7)
+    print("\n[*] Gathering system information...")
+    print("    → Architecture: x86_64")
+    time.sleep(0.1)
+    print("    → CPU: Intel(R) Xeon(R) CPU E5-2678 v3 @ 2.50GHz")
+    print("    → Hostname: ubuntu-server")
+    time.sleep(1.2)
+    print("    → System load: 0.08, 0.03, 0.01")
+
+    time.sleep(2.1)
+    print("\n[*] Enumerating running services...")
+    time.sleep(1.8)
+    for service in ["systemd v245 (245.4-4ubuntu3.20)", "snapd v2.58", 
+                   "polkit v0.105-26ubuntu1.1", "dbus v1.12.16"]:
+        print(f"    → {service}")
+        time.sleep(random.uniform(0.2, 0.4))
+
+    print("\n[*] Checking installed packages...")
+    time.sleep(4.2)
+    print("    → Found 2,184 packages installed")
+
+    print("\n[*] Enumerating SUID binaries...")
+    time.sleep(5.8)
+    for binary in ["/usr/bin/sudo", "/usr/bin/pkexec", 
+                  "/usr/bin/polkit-agent-helper-1", 
+                  "/usr/lib/policykit-1/polkit-agent-helper-1"]:
+        time.sleep(random.uniform(0.1, 0.3))
+        print(f"    → {binary}")
+
+    print_header("Scanning for known vulnerabilities")
+    
+    cves_to_check = [
+        ("CVE-2023-7028", 1.2, True),
+        ("CVE-2023-4911", 0.4, False),
+        ("CVE-2023-2640", 2.3, True),
+        ("CVE-2023-0466", 0.6, False),
+        ("CVE-2022-3328", 0.9, False),
+        ("CVE-2022-2588", 1.7, True)
+    ]
+    
+    for cve, delay, timeout in cves_to_check:
+        print(f"[*] Checking {cve}... ", end='', flush=True)
+        if timeout and delay > 2:
+            time.sleep(2)
+            print("timeout, retrying... ", end='', flush=True)
+            time.sleep(0.8)
+        time.sleep(delay)
+        print("not vulnerable")
+
+    print("\n[*] Checking CVE-2023-32629... ", end='', flush=True)
+    time.sleep(1.8)
+    print("\x1b[31mVULNERABLE\x1b[0m")
+    
+    print_header("Vulnerability Details")
+    print("""CVE-2023-32629: PwnKit - Local Privilege Escalation
+Impact: Complete system compromise
+Vector: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+Score: 7.8 (High)
+
+Description:
+PolicyKit (polkit) 0.105-26ubuntu1.1 on Ubuntu 20.04.5 LTS contains
+a vulnerability in the pkexec component that allows local privilege
+escalation to root through improper handling of environment variables.
+
+Affected Component:
+→ /usr/bin/pkexec (SUID binary)
+→ Current version: 0.105-26ubuntu1.1""")
+
+    print_header("Exploitation Path")
+    print("""[+] Privilege escalation possible via pkexec
+[+] Exploit available at: exploit.sh
+[+] Execute with: ./exploit.sh
+
+Note: System appears to be vulnerable. Success rate estimated at 95%""")
 
 def download_and_execute_exploit():
     """Simulates downloading and executing a privilege escalation exploit."""
     global is_admin
     print("\n[*] Starting privilege escalation sequence...")
+    time.sleep(0.5)
+    print("[*] Checking system version... Ubuntu 20.04.5 LTS")
+    time.sleep(0.5)
+    print("[*] Downloading exploit (CVE-2023-32629)")
+    
+    progress_chunks = [
+        (0, 23, 0.03, None),
+        (23, 24, 0.8, 23.5),
+        (24, 45, 0.02, None),
+        (45, 46, 1.2, 45.2),
+        (46, 67, 0.04, None),
+        (67, 89, 0.01, None),
+        (89, 90, 0.7, 89.5),
+        (90, 100, 0.03, None),
+    ]
+    
+    for chunk_start, chunk_end, delay, pause_at in progress_chunks:
+        for i in range(int(chunk_start), int(chunk_end) + 1):
+            if pause_at and i >= pause_at and i < pause_at + 1:
+                time.sleep(2)
+            sys.stdout.write(f"\r[{'=' * (i // 2)}{' ' * (50 - (i // 2))}] {i}%")
+            sys.stdout.flush()
+            time.sleep(delay)
+    print("\n")
+    
+    print("[*] Compiling exploit source...")
     time.sleep(1)
-    print("[*] Downloading exploit script...")
-    for i in range(101):
-        sys.stdout.write(f"\r[{'=' * (i // 2)}{' ' * (50 - (i // 2))}] {i}%")
-        sys.stdout.flush()
-        time.sleep(0.05)
-    print("\n[+] Exploit downloaded successfully.")
-    time.sleep(1)
-    print("[*] Executing exploit...")
-    time.sleep(2)
-    print("[+] Privilege escalation successful. You are now root.")
+    print("[*] gcc -o exploit exploit.c")
+    time.sleep(0.5)
+    print("[*] chmod +x exploit")
+    time.sleep(0.5)
+    print("[*] Executing ./exploit...")
+    time.sleep(0.5)
+    print("[+] Privilege escalation successful!")
+    print("[+] New user privileges: uid=0(root) gid=0(root) groups=0(root)")
     is_admin = True
 
 def ssh_session():
     """Simulates an SSH session."""
     global current_directory, is_admin
-
+    
     while True:
         prompt = f"{'root' if is_admin else 'a.turing'}@ubuntu-server:{current_directory}$ "
         try:
@@ -294,26 +505,21 @@ def ssh_session():
                 print(cat_file(filepath))
             else:
                 print("cat: missing operand")
-        elif command.startswith("./"):
-            script_name = command[2:]  # Remove ./
-            if script_name in ["exploit.sh", "exploitscan.py", "exfildata.py", "ransomware.py", "exfil"]:
-                if script_name == "exploit.sh":
-                    download_and_execute_exploit()
-                elif script_name == "exploitscan.py":
-                    simulate_data_exfiltration()
-                elif script_name in ["exfildata.py", "exfil"]:
-                    simulate_data_exfiltration()
-                elif script_name == "ransomware.py":
-                    simulate_ransomware()
-            else:
-                print(f"bash: {command}: No such file or directory")
+        elif command == "./exploit.sh":
+            download_and_execute_exploit()
+        elif command == "./exploitscan.py":
+            scan_system()
+        elif command == "./exfildata.py":
+            simulate_data_exfiltration()
+        elif command == "./ransomware.py":
+            simulate_ransomware()
         else:
             print(f"bash: {command}: command not found")
 
 def main():
     """Main entry point for the fake SSH server."""
     title_screen()
-
+    
     if authenticate():
         ssh_session()
 
