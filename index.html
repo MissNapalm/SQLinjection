@@ -10,6 +10,14 @@
             font-size: 4rem;
             text-align: center;
         }
+        .admin-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .admin-actions button {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -105,6 +113,11 @@
                             <div class="p-4">
                                 <h2 class="text-xl font-bold">${result.title}</h2>
                                 <p>${result.content}</p>
+                                ${isAdmin ? `
+                                <div class="admin-actions">
+                                    <button class="bg-red-500 text-white px-4 py-2 rounded delete-button" data-id="${result.id}">Delete</button>
+                                </div>
+                                ` : ''}
                             </div>
                         </div>
                     `;
@@ -143,6 +156,14 @@
             renderResults(results);
         }
 
+        function deleteArticle(id) {
+            const index = articles.findIndex(article => article.id === id);
+            if (index !== -1) {
+                articles.splice(index, 1);
+                renderResults(articles.map(article => ({ ...article, type: "article" })));
+            }
+        }
+
         function login() {
             const username = usernameInput.value;
             const password = passwordInput.value;
@@ -151,10 +172,18 @@
                 isAdmin = true;
                 adminMessage.classList.remove("hidden");
                 alert("Logged in as admin!");
+                renderResults(articles.map(article => ({ ...article, type: "article" })));
             } else {
                 alert("Invalid credentials!");
             }
         }
+
+        queryResults.addEventListener("click", event => {
+            if (event.target.classList.contains("delete-button")) {
+                const id = parseInt(event.target.dataset.id, 10);
+                deleteArticle(id);
+            }
+        });
 
         searchButton.addEventListener("click", searchArticles);
         searchInput.addEventListener("keypress", (event) => {
