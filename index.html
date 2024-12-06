@@ -18,6 +18,20 @@
         .admin-actions button {
             margin-left: 10px;
         }
+        .user-container {
+            word-wrap: break-word;
+            font-family: monospace;
+            background-color: #f9fafb;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        .user-container strong {
+            color: #374151;
+        }
+        .user-container p {
+            margin: 0.5rem 0;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -83,13 +97,13 @@
         ];
 
         const users = [
-            { username: "a.swartz", password: "open_sesame" },
-            { username: "admin_root", password: "supersecureadmin" },
-            { username: "j.doe", password: "password123" },
-            { username: "e.musk", password: "mars4ever" },
-            { username: "s.jobs", password: "apple1984" },
-            { username: "j.bezos", password: "amazon_prime" },
-            { username: "a.turing", password: "enigma_machine" }
+            { username: "a.swartz", hash: "5f4dcc3b5aa765d61d8327deb882cf99" }, // "password"
+            { username: "admin_root", hash: "e99a18c428cb38d5f260853678922e03" }, // "abc123"
+            { username: "j.doe", hash: "098f6bcd4621d373cade4e832627b4f6" }, // "test"
+            { username: "e.musk", hash: "5ebe2294ecd0e0f08eab7690d2a6ee69" }, // "secret"
+            { username: "s.jobs", hash: "d8578edf8458ce06fbc5bb76a58c5ca4" }, // "qwerty"
+            { username: "j.bezos", hash: "25f9e794323b453885f5181f1b624d0b" }, // "123456789"
+            { username: "a.turing", hash: "098f6bcd4621d373cade4e832627b4f6" } // "test"
         ];
 
         const adminCredentials = { username: "admin", password: "password123" };
@@ -123,9 +137,9 @@
                     `;
                 } else if (result.type === "user") {
                     return `
-                        <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="user-container">
                             <p><strong>Username:</strong> ${result.username}</p>
-                            <p><strong>Password:</strong> ${result.password}</p>
+                            <p><strong>Hash:</strong> ${result.hash}</p>
                         </div>
                     `;
                 }
@@ -140,8 +154,8 @@
                 const newTitle = query.match(/SET title='(.*?)'/)[1];
                 siteTitle.textContent = newTitle;
                 results = articles.map(article => ({ ...article, type: "article" }));
-            } else if (query.includes("UNION SELECT username, password")) {
-                results = users.map(user => ({ username: user.username, password: user.password, type: "user" }));
+            } else if (query.includes("UNION SELECT username, password") || query.includes("UNION SELECT username, hash")) {
+                results = users.map(user => ({ username: user.username, hash: user.hash, type: "user" }));
             } else {
                 results = articles
                     .filter(article => article.title.toLowerCase().includes(query.toLowerCase()))
@@ -166,9 +180,9 @@
 
         function login() {
             const username = usernameInput.value;
-            const password = passwordInput.value;
+            const password = username === "admin" && passwordInput.value === "password123";
 
-            if (username === adminCredentials.username && password === adminCredentials.password) {
+            if (password) {
                 isAdmin = true;
                 adminMessage.classList.remove("hidden");
                 alert("Logged in as admin!");
