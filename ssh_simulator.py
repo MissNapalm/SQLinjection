@@ -80,15 +80,48 @@ def copy_tools_from_server():
     time.sleep(2)
     print("[+] Connection established: 203.0.113.42:22")
     
-    tools = ["exploitscan.py", "exploit.sh", "exfildata.py"]  # Removed ransomware.py
+    tools = [
+        {"name": "exploitscan.py", "size": 10.2},
+        {"name": "exploit.sh", "size": 4.5},
+        {"name": "exfildata.py", "size": 7.8}
+    ]
+    
     for tool in tools:
-        print(f"[*] Copying {tool}...")
-        time.sleep(random.uniform(1.0, 2.0))
-        print(f"[+] {tool} copied successfully.")
+        file_size = tool["size"]
+        print(f"[*] Copying {tool['name']}...")
+        transferred = 0
+        while transferred < file_size:
+            chunk = min(random.uniform(0.5, 1.5), file_size - transferred)
+            transferred += chunk
+            progress = (transferred / file_size) * 100
+            sys.stdout.write(f"\r    {tool['name']} [{int(progress/2)*'='}{(50-int(progress/2))*' '}] {progress:.1f}% {transferred:.1f}/{file_size:.1f} MB")
+            sys.stdout.flush()
+            time.sleep(random.uniform(0.1, 0.4))
+        print(f"\n[+] {tool['name']} copied successfully.")
     
     print("\n[*] Closing connection to attack server...")
     time.sleep(1.5)
     print("[+] Tools copied and ready for use.")
+
+    # Simulate post-copy setup
+    print("\n[*] Preparing tools for use...")
+    time.sleep(1)
+    setup_tools()
+
+
+def setup_tools():
+    """Simulates setting up the downloaded tools."""
+    commands = [
+        "chmod +x /tmp/exploit.sh",
+        "chmod +x /tmp/exploitscan.py",
+        "chmod +x /tmp/exfildata.py"
+    ]
+    for cmd in commands:
+        sys.stdout.write(f"a.turing@ubuntu-server:/$ {cmd}\n")
+        sys.stdout.flush()
+        time.sleep(random.uniform(0.5, 1.0))
+        print("[+] Command executed successfully.")
+    print("\n[+] Tools are ready to execute.")
 
 def clear_screen():
     """Clears the terminal screen."""
@@ -117,7 +150,29 @@ def authenticate():
         
         if username == "a.turing" and password == "test":
             print("\nWelcome to Ubuntu 20.04.5 LTS (GNU/Linux 5.4.0-135-generic x86_64)\n")
-            copy_tools_from_server()  # Trigger the sequence here
+            time.sleep(1)
+            
+            # Display basic system status
+            print("Last login: Thu Dec  7 12:34:56 2023 from 192.168.1.100")
+            print("System load: 0.08, 0.03, 0.01    Users logged in: 1")
+            print("Disk usage: 54% of 100GB used\n")
+            time.sleep(1.5)
+            
+            # Simulate typing the command with a proper prompt
+            prompt = "a.turing@ubuntu-server:/$ "
+            fake_command = f"scp user@203.0.113.42:/tools/*.py /tmp/"
+            sys.stdout.write(prompt)
+            sys.stdout.flush()
+            time.sleep(0.5)  # Pause before typing to simulate realism
+            for char in fake_command:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+                time.sleep(random.uniform(0.05, 0.1))  # Simulate typing delay
+            time.sleep(0.3)
+            sys.stdout.write("\n")  # Move to the next line
+            
+            # Trigger the tool-copying sequence
+            copy_tools_from_server()
             return True
         else:
             attempts += 1
@@ -131,6 +186,8 @@ def authenticate():
         
         time.sleep(1)
     return False
+
+
 
 def check_directory_access(path):
     """Checks if the current user has access to the specified directory."""
@@ -337,7 +394,9 @@ def simulate_ransomware():
     0xC7F2A95B4E8D3A1C
     
     WARNING: Do not attempt to decrypt files or modify them, or they will be
-    permanently damaged.{RESET}""")
+    permanently damaged.
+    
+    {RESET}""")
 
 def scan_system():
     """Simulates a thorough system scan for privilege escalation vulnerabilities."""
