@@ -14,9 +14,10 @@ def get_terminal_size():
         return os.terminal_size((80, 24))
 
 # Simulated file structure with permissions
+
 file_system = {
     "/": {
-        "contents": ["home", "var", "etc"],
+        "contents": ["home", "var", "etc", "exploitscan.py", "exploit.sh", "exfildata.py", "surprise.py"],
         "permissions": {"read": True, "execute": True}
     },
     "/home": {
@@ -24,7 +25,7 @@ file_system = {
         "permissions": {"read": True, "execute": True}
     },
     "/home/a.turing": {
-        "contents": ["notes.txt", "exploitscan.py", "exploit.sh", "exfildata.py", "ransomware.py"],
+        "contents": ["notes.txt"],
         "permissions": {"read": True, "execute": True}
     },
     "/var": {
@@ -49,6 +50,7 @@ file_system = {
     }
 }
 
+
 # Simulated employee data
 employee_data = [
     {"name": "John Smith", "role": "Software Engineer", "email": "john.smith@company.com"},
@@ -69,6 +71,24 @@ def generate_client_file_content(index):
     ]
     client = fake_clients[index % len(fake_clients)]
     return f"{client['name']}: {client['card_number']} (Expiry: {client['expiry']}, CVV: {client['cvv']})"
+
+def copy_tools_from_server():
+    """Simulates copying tools from an attack server."""
+    print("\n[*] Connecting to attack server...")
+    time.sleep(1.5)
+    print("[*] Establishing secure connection...")
+    time.sleep(2)
+    print("[+] Connection established: 203.0.113.42:22")
+    
+    tools = ["exploitscan.py", "exploit.sh", "exfildata.py"]  # Removed ransomware.py
+    for tool in tools:
+        print(f"[*] Copying {tool}...")
+        time.sleep(random.uniform(1.0, 2.0))
+        print(f"[+] {tool} copied successfully.")
+    
+    print("\n[*] Closing connection to attack server...")
+    time.sleep(1.5)
+    print("[+] Tools copied and ready for use.")
 
 def clear_screen():
     """Clears the terminal screen."""
@@ -97,6 +117,7 @@ def authenticate():
         
         if username == "a.turing" and password == "test":
             print("\nWelcome to Ubuntu 20.04.5 LTS (GNU/Linux 5.4.0-135-generic x86_64)\n")
+            copy_tools_from_server()  # Trigger the sequence here
             return True
         else:
             attempts += 1
@@ -511,7 +532,7 @@ def ssh_session():
             scan_system()
         elif command == "./exfildata.py":
             simulate_data_exfiltration()
-        elif command == "./ransomware.py":
+        elif command == "./surprise.py":
             simulate_ransomware()
         else:
             print(f"bash: {command}: command not found")
