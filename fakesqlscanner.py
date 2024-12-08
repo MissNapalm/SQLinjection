@@ -2,84 +2,115 @@ import time
 import random
 import sys
 
-# Simulated endpoints for testing SQL Injection
 ENDPOINTS = [
-    {"url": "/search?query=", "method": "GET", "parameter": "query"},
     {"url": "/login", "method": "POST", "parameter": "username"},
-    {"url": "/login", "method": "POST", "parameter": "password"},
+    {"url": "/search?query=", "method": "GET", "parameter": "query"},
     {"url": "/admin/update_title", "method": "POST", "parameter": "site_title"},
 ]
 
-# Simulated payloads
 PAYLOADS = [
-    "' OR '1'='1",  # Boolean-based SQLi
-    "' UNION SELECT NULL--",  # UNION-based SQLi
-    "' UNION SELECT username, hash FROM users--",  # Data extraction
-    "'; DROP TABLE users;--",  # Malicious intent
-    "' AND 1=1--",  # Logical payload
-    "UPDATE site_title SET title='Hacked by SQLi';--",  # Defacement payload
+    "' OR '1'='1",
+    "' UNION SELECT NULL--",
+    "' UNION SELECT username, hash FROM users--",
+    "'; DROP TABLE users;--",
+    "' AND 1=1--",
+    "UPDATE site_title SET title='Hacked by SQLi';--", 
+    "admin' --",
 ]
 
-# Simulated vulnerable endpoints
 VULNERABLE_ENDPOINTS = {
-    "/search?query=": ["' OR '1'='1", "' UNION SELECT username, hash FROM users--"],
-    "/login": ["' OR '1'='1", "' UNION SELECT NULL--"],
-    "/admin/update_title": ["UPDATE site_title SET title='Hacked by SQLi';--"],
+    "/search?query=": ["' UNION SELECT username, hash FROM users--"],
+    "/admin/update_title": ["UPDATE site_title SET title='Hacked by SQLi';--"]
 }
 
 def print_banner():
-    """Prints the banner for the fake SQL vulnerability scanner."""
-    print("\033[92m")  # Green text
+    print("\033[92m")
     print("=" * 80)
-    print("SQLi Vulnerability Scanner v1.1")
-    print("Simulating SQL Injection scanning for educational purposes.")
+    print("Advanced SQLi Vulnerability Scanner v2.0")
+    print("Simulating SQL Injection detection for presentation purposes.")
     print("=" * 80)
-    print("\033[0m")  # Reset text color
+    print("\033[0m")
+
+def simulate_task(task_name, duration=3):
+    print(f"\n[*] {task_name}")
+    for i in range(101):
+        sys.stdout.write(f"\r Progress: [{'=' * (i // 2)}{' ' * (50 - (i // 2))}] {i}%")
+        sys.stdout.flush()
+        time.sleep(duration / 100)
+    print()
 
 def scan_endpoint(endpoint):
-    """Simulates scanning an endpoint for SQL injection vulnerabilities."""
-    print(f"\n[INFO] Scanning endpoint: {endpoint['url']} (Method: {endpoint['method']})")
-    time.sleep(1.5)
+    print(f"\n[INFO] Scanning endpoint: {endpoint['url']} ({endpoint['method']})")
+    print(" [*] Testing endpoint availability...")
+    time.sleep(random.uniform(1.5, 2.5))  # Add delay for tension
 
-    for payload in PAYLOADS:
-        sys.stdout.write(f"    Testing payload: {payload}... ")
-        sys.stdout.flush()
-        time.sleep(random.uniform(0.5, 1.5))
+    found_vulns = set()
 
-        if endpoint["url"] in VULNERABLE_ENDPOINTS and payload in VULNERABLE_ENDPOINTS[endpoint["url"]]:
-            print("\033[91mVULNERABLE\033[0m")  # Red text
-            print(f"        → Vulnerable to payload: {payload}")
+    for i, payload in enumerate(PAYLOADS):
+        print(f" Testing payload: {payload}...")
+        time.sleep(random.uniform(1.0, 2.0))
+
+        # Simulate retries for certain payloads
+        if random.random() < 0.15:
+            print(" [!] Connection timeout, retrying...")
+            time.sleep(random.uniform(1.5, 2.5))
+
+        # Simulate detecting vulnerabilities
+        is_vulnerable = (
+            endpoint["url"] in VULNERABLE_ENDPOINTS and 
+            payload in VULNERABLE_ENDPOINTS[endpoint["url"]]
+        )
+
+        if is_vulnerable:
+            if payload == "' UNION SELECT username, hash FROM users--":
+                print("\033[93m[!] SUSPICIOUS: SQL error-based injection detected.\033[0m")
+                found_vulns.add(payload)
+            elif payload == "UPDATE site_title SET title='Hacked by SQLi';--":
+                print("\033[91m[!] VULNERABLE: SQL blind injection confirmed.\033[0m")
+                found_vulns.add(payload)
         else:
             print("Not vulnerable")
 
-def progress_bar(task, duration=5):
-    """Simulates a progress bar for tasks."""
-    print(f"\n[*] {task}")
-    for i in range(101):
-        time.sleep(duration / 100)
-        sys.stdout.write(f"\r    Progress: [{'=' * (i // 2)}{' ' * (50 - (i // 2))}] {i}%")
-        sys.stdout.flush()
-    print("\n[+] Completed.")
+        if random.random() < 0.3:
+            print(" [*] Performing deeper analysis...")
+            time.sleep(random.uniform(2.0, 3.0))
+
+    return found_vulns
 
 def run_scanner():
-    """Main function to simulate the scanner."""
     print_banner()
-    time.sleep(2)
-
-    print("[INFO] Initiating SQL Injection vulnerability scan...")
     time.sleep(1)
-    progress_bar("Loading payloads", duration=3)
+    print("[INFO] Starting SQL injection scan...")
+
+    simulate_task("Loading attack patterns", duration=5)
+    simulate_task("Compiling detection rules", duration=4)
+
+    print("[*] Initiating WAF (Web Application Firewall) detection")
+    time.sleep(random.uniform(1.5, 3.0))
+    print("[INFO] No WAF detected. Proceeding with payload testing.")
+
+    confirmed_vulns = {}
 
     for endpoint in ENDPOINTS:
-        scan_endpoint(endpoint)
+        vulnerabilities = scan_endpoint(endpoint)
+        if vulnerabilities:
+            confirmed_vulns[endpoint["url"]] = vulnerabilities
 
     print("\n[INFO] Scan completed.")
-    print("[+] Vulnerabilities found on the following endpoints:")
-    for endpoint, payloads in VULNERABLE_ENDPOINTS.items():
-        print(f"    - {endpoint}")
-        for payload in payloads:
-            print(f"        → Payload: {payload}")
-    print("\n[INFO] Use the extracted data responsibly.")
+
+    if confirmed_vulns:
+        print("\n[!] Confirmed vulnerabilities:")
+        for url, payloads in confirmed_vulns.items():
+            print(f"\n Endpoint: {url}")
+            for payload in payloads:
+                print(f" → Payload: {payload}")
+    else:
+        print("\n[!] No high-confidence vulnerabilities found")
 
 if __name__ == "__main__":
-    run_scanner()
+    try:
+        run_scanner()
+    except KeyboardInterrupt:
+        print("\n\n[!] Scan interrupted")
+        print("[!] Results incomplete")
+        sys.exit(1)
